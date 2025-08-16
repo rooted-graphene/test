@@ -12,6 +12,8 @@ on:
 jobs:
   create-release:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.check_release.outputs.release_created }}
     steps:
       - name: Checkout rooted-graphene script repository
         uses: actions/checkout@v5
@@ -30,4 +32,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPO: ${{ github.repository }}
         run: |
-          DEBUG=1 bash -c '. rooted-ota.sh && findLatestVersion && checkBuildNecessary && createReleaseIfNecessary'
+          DEBUG=1 bash -c '. rooted-ota.sh && findLatestVersion && checkBuildNecessary && createReleaseIfNecessary && echo "release_created=true" >> $GITHUB_OUTPUT'
+  
+  trigger-multiple-release:
+    needs: create-release
+    if: needs.create-release.outputs.release_created == 'true'
+    uses: ./.github/workflows/release-multiple.yaml
+    secrets: inherit
