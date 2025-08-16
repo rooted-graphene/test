@@ -1,8 +1,14 @@
 name: Release multiple devices
 
 on:
-  release:
-    types: [ created ]
+  #release:
+   # types: [created]
+  # Triggering on release seems to need additional PAT: https://stackoverflow.com/a/69063453/1845976
+  # So use workflow_call
+  workflow_call:
+  # Keep cron to make sure devices released later still get built
+  #schedule:
+  #  - cron:  '30 6 * * *'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 permissions:
